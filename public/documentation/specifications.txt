@@ -1,0 +1,18 @@
+*******
+Ton objectif sera de développer des API de gestion de contacts (Create/Read/Update/Delete) :
+•Pas de Front - Les API doivent pouvoir être utilisées avec Postman par exemple,
+•Data Contact : Nom / Prénom / Email / Adresse / Téléphone / Age,
+•Mettre en place, autant que faire se peut, une vérification de la saisie,
+•Format de sortie : JSON,
+•PHP 7 minimum - POO obligatoire,
+•MySQL ou PostgreSQL au choix,
+•Framework recommandé : Symfony 4 minimum (le choix peut être de ne pas utiliser de framework, auquel cas il faudra construire ta propre architecture, à ta convenance, et justifier ton choix),
+•L'utilisation de Github est bienvenue ; 1 push d'initialisation et 1 push de fin au minimum ; attention au nom de branche et messages de commit,
+•L'utilisation de normes comme PSR2 est un plus,
+•L'utilisation de design patterns est un plus,
+•L'utilisation de namespace est un plus,
+•Les API Rest sont un plus,
+•La documentation est un plus,
+•Le SQL est aussi important que le PHP.
+Important : Tu ne peux pas utiliser d’API Plateform 😉 
+*******
