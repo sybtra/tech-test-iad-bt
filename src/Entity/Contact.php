@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass=ContactRepository::class)
  */
-class Contact
+class Contact implements \JsonSerializable
 {
     /**
      * @ORM\Id
@@ -44,7 +44,7 @@ class Contact
     private $adresse;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string")
      * @Assert\NotBlank
      */
     private $telephone;
@@ -130,5 +130,17 @@ class Contact
         $this->age = $age;
 
         return $this;
+    }
+    public function jsonSerialize(): mixed
+    {
+        return [
+            'id' => $this->getId(),
+            'nom' => $this->getNom(),
+            'prenom' => $this->getPrenom(),
+            'email' => $this->getEmail(),
+            'adresse' => $this->getAdresse(),
+            'telephone' => $this->getTelephone(),
+            'age' => $this->getAge()
+        ];
     }
 }
