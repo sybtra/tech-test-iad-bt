@@ -141,6 +141,7 @@ class ContactController extends AbstractController
         ], 200);
     }
     /**
+     * deletes a contact form the database
      * @param int $id
      * @param ContactRepository $contactRepository
      * @param EntityManagerInterface $entityManager
