@@ -10,8 +10,12 @@ namespace App\Controller;
 
 use Exception;
 use App\Entity\Contact;
+use OpenApi\Annotations\Items as Items;
+use OpenApi\Annotations\JsonContent as JsonContent;
 use App\Repository\ContactRepository;
+use OpenApi\Annotations\Response as OA;
 use Doctrine\ORM\EntityManagerInterface;
+use Nelmio\ApiDocBundle\Annotation\Model;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -34,6 +38,14 @@ class ContactController extends AbstractController
      * @param ContactRepository $contactRepository
      * 
      * @Route("/contacts", name="contacts", methods={"GET"})
+     * @OA(
+     *     response=200,
+     *     description="Returns all contacts.",
+     *     @JsonContent(
+     *        type="array",
+     *        @Items(ref=@Model(type=Contact::class, groups={"full"}))
+     *     )
+     * )
      * @return JsonResponse
      */
     public function getAllContactsAction(ContactRepository $contactRepository): JsonResponse
@@ -54,8 +66,15 @@ class ContactController extends AbstractController
      * @param EntityManagerInterface $entityManager
      * @param Request $request
      * @param SerializerInterface $serializer
-     * 
      * @Route("/contacts", name="new_contact", methods={"POST"})
+     * @OA(
+     *     response=201,
+     *     description="Returns new contacts.",
+     *     @JsonContent(
+     *        type="array",
+     *        @Items(ref=@Model(type=Contact::class, groups={"one"}))
+     *     )
+     * )
      * @return JsonResponse
      */
     public function newContactAction(ContactRepository $contactRepository, ValidatorInterface $validator, EntityManagerInterface $entityManager, Request $request, SerializerInterface $serializer): JsonResponse
@@ -94,8 +113,15 @@ class ContactController extends AbstractController
      * gets details of one contact
      * @param int $id
      * @param ContactRepository $contactRepository
-     * 
      * @Route("/contacts/{id}", name="get_contact", methods={"GET"})
+     * @OA(
+     *     response=200,
+     *     description="Returns one contact.",
+     *     @JsonContent(
+     *        type="array",
+     *        @Items(ref=@Model(type=Contact::class, groups={"one"}))
+     *     )
+     * )
      * @return JsonResponse
      */
     public function getOneContactAction(int $id, ContactRepository $contactRepository): JsonResponse
@@ -119,8 +145,15 @@ class ContactController extends AbstractController
      * @param EntityManagerInterface $entityManager
      * @param Request $request
      * @param ContactRepository $contactRepository
-     * 
      * @Route("/contacts/{id}", name="edit_contact", methods={"PUT"})
+     * @OA(
+     *     response=202,
+     *     description="Returns one contact.",
+     *     @JsonContent(
+     *        type="array",
+     *        @Items(ref=@Model(type=Contact::class, groups={"one"}))
+     *     )
+     * )
      * @return JsonResponse
      */
     public function editContactAction(int $id, ContactRepository $contactRepository, ValidatorInterface $validator, EntityManagerInterface $entityManager, Request $request): JsonResponse
@@ -171,8 +204,15 @@ class ContactController extends AbstractController
      * @param int $id
      * @param ContactRepository $contactRepository
      * @param EntityManagerInterface $entityManager
-     * 
      * @Route("/contacts/{id}", name="delete_contact", methods={"DELETE"})
+     * @OA(
+     *     response=202,
+     *     description="Returns one contact.",
+     *     @JsonContent(
+     *        type="array",
+     *        @Items(ref=@Model(type=Contact::class, groups={"one"}))
+     *     )
+     * )
      * @return JsonResponse
      */
     public function deleteContactAction(int $id, ContactRepository $contactRepository, EntityManagerInterface $entityManager): JsonResponse

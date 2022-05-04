@@ -1,9 +1,16 @@
 nelmio_api_doc:
     documentation:
+        servers:
+          - url: https://127.0.0.1:8000/
+            description: API over HTTP
+         # - url: https://api.example.com/secured
+          #  description: API over HTTPS
         info:
             title: My App
             description: This is an awesome app!
             version: 1.0.0
     areas: # to filter documented areas
         path_patterns:
-            - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
+            - ^/api(?!/doc$)
+        host_patterns:
+            - ^api\.
