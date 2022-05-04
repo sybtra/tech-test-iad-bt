@@ -44,7 +44,7 @@ class ContactController extends AbstractController
             ], 404);
         }
         return $this->json([
-            'data' => $contactRepository->findAll()
+            'contact' => $contactRepository->findAll()
         ], 200);
     }
     /**
@@ -60,18 +60,26 @@ class ContactController extends AbstractController
      */
     public function newContactAction(ContactRepository $contactRepository, ValidatorInterface $validator, EntityManagerInterface $entityManager, Request $request, SerializerInterface $serializer): JsonResponse
     {
-        $contact = $serializer->deserialize($request->getContent(), Contact::class, 'json');
+        $data = $request->getContent();
+        if (!$this->isJson($data)) {
+            return $this->json([
+                "errors" => "please provide a valid json and complet contact data."
+            ], 406);
+        }
+        $contact = $serializer->deserialize($data, Contact::class, 'json');
         $error = $validator->validate($contact);
         if (count($error) > 0) {
             return $this->json([
                 "errors" => $error,
             ], 422);
         }
-        $elderContact = $contactRepository->findOneBy(['email' => $contact->getEmail()]);
-        if ($contact->getEmail() == $elderContact->getEmail()) {
-            return $this->json([
-                'erroe' => 'this email adress already exists'
-            ], 422);
+        if (!empty($contactRepository->findAll())) {
+            $elderContact = $contactRepository->findOneBy(['email' => $contact->getEmail()]);
+            if ($elderContact) {
+                return $this->json([
+                    'erroe' => 'this email adress already exists'
+                ], 406);
+            }
         }
         $entityManager->persist($contact);
         $entityManager->flush();
@@ -110,13 +118,12 @@ class ContactController extends AbstractController
      * @param ValidatorInterface $validator
      * @param EntityManagerInterface $entityManager
      * @param Request $request
-     * @param SerializerInterface $serializer
      * @param ContactRepository $contactRepository
      * 
      * @Route("/contacts/{id}", name="edit_contact", methods={"PUT"})
      * @return JsonResponse
      */
-    public function editContactAction(int $id, ContactRepository $contactRepository, ValidatorInterface $validator, EntityManagerInterface $entityManager, SerializerInterface $serializer, Request $request): JsonResponse
+    public function editContactAction(int $id, ContactRepository $contactRepository, ValidatorInterface $validator, EntityManagerInterface $entityManager, Request $request): JsonResponse
     {
         $gotContact = $contactRepository->find($id);
         if (!$gotContact) {
@@ -124,8 +131,26 @@ class ContactController extends AbstractController
                 'error' => 'contact not found',
             ], 404);
         }
-        $contact = $serializer->deserialize($request->getContent(), Contact::class, 'json');
-        $gotContact = $contact;
+        $data = $request->getContent();
+        if (!$this->isJson($data)) {
+            return $this->json([
+                "errors" => "please provide a valid json and complet contact data."
+            ], 406);
+        }
+        $contact = json_decode($data, true);
+        $elderContact = $contactRepository->findOneBy(['email' => $contact['email']]);
+        if ($elderContact != $gotContact && ($elderContact)) {
+            return $this->json([
+                'erroe' => 'this email adress already exists'
+            ], 406);
+        }
+
+        ($contact['nom'] != $gotContact->getNom()) ? $gotContact->setNom($contact['nom']) : $gotContact->getNom();
+        ($contact['prenom'] != $gotContact->getPrenom()) ? $gotContact->setPrenom($contact['prenom']) : $gotContact->getPrenom();
+        ($contact['email'] != $gotContact->getEmail()) ? $gotContact->setEmail($contact['email']) : $gotContact->getEmail();
+        ($contact['adresse'] != $gotContact->getAdresse()) ? $gotContact->setAdresse($contact['adresse']) : $gotContact->getAdresse();
+        ($contact['telephone'] != $gotContact->getTelephone()) ? $gotContact->setTelephone($contact['telephone']) : $gotContact->getTelephone();
+        ($contact['age'] != $gotContact->getAge()) ? $gotContact->setAge($contact['age']) : $gotContact->getAge();
 
         $error = $validator->validate($gotContact);
         if (count($error) > 0) {
@@ -133,12 +158,13 @@ class ContactController extends AbstractController
                 "errors" => $error,
             ], 422);
         }
+
         $entityManager->flush();
 
         return $this->json([
-            'success' => 'New contact has been update succefully',
+            'success' => 'Contact has been update succefully',
             'contact' => $gotContact
-        ], 200);
+        ], 202);
     }
     /**
      * deletes a contact form the database
@@ -161,6 +187,10 @@ class ContactController extends AbstractController
         $entityManager->flush();
         return $this->json([
             'success' => 'the contact has been deleted successfully'
-        ], 200);
+        ], 202);
+    }
+    protected function isJson($data)
+    {
+        return is_string($data) && is_array(json_decode($data, true)) && (json_last_error() == JSON_ERROR_NONE) ? true : false;
     }
 }
